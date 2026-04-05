@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paper Trading</title>
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <div class="container">
+
+    <h1>📄 Paper Trading</h1>
+    <p class="subtitle">
+      Simulate trades safely with virtual capital
+    </p>
+
+    <div class="trade-card">
+
+      <input
+        id="tradeSymbol"
+        placeholder="Stock Symbol (AAPL)"
+        autocomplete="off"
+      />
+
+      <input
+        id="quantity"
+        type="number"
+        placeholder="Quantity"
+        min="1"
+      />
+
+      <div class="trade-actions">
+        <button onclick="placeTrade('buy')" class="buy">
+          BUY
+        </button>
+
+        <button onclick="placeTrade('sell')" class="sell">
+          SELL
+        </button>
+      </div>
+
+    </div>
+
+    <div id="tradeResult" class="trade-result"></div>
+
+  </div>
+
+  <script>
+    const API_BASE = "https://ai-stock-platform-zpkg.onrender.com";
+
+    async function placeTrade(action) {
+
+      const symbol = document
+        .getElementById("tradeSymbol")
+        .value
+        .trim()
+        .toUpperCase();
+
+      const quantity = parseInt(
+        document.getElementById("quantity").value
+      );
+
+      const resultBox = document.getElementById("tradeResult");
+
+      if (!symbol || !quantity || quantity <= 0) {
+        resultBox.innerHTML = "⚠ Please enter valid symbol and quantity";
+        return;
+      }
+
+      resultBox.innerHTML = "Processing trade...";
+
+      try {
+
+        const response = await fetch(`${API_BASE}/trade`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            symbol: symbol,
+            action: action,
+            quantity: quantity
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.status === "error") {
+          resultBox.innerHTML = `<p style="color:#ef4444">${data.message}</p>`;
+          return;
+        }
+
+        const portfolio = data.portfolio;
+
+        const price = Number(data.trade.price).toFixed(2);
+        const balance = Number(portfolio.balance).toFixed(2);
+        const totalValue = Number(portfolio.total_value).toFixed(2);
+
+        resultBox.innerHTML = `
+          <div class="trade-success ${action}">
+            ${action.toUpperCase()} executed at $${price}
+          </div>
+
+          <div class="portfolio-summary">
+            <div class="summary-card">
+              <h4>Balance</h4>
+              <p>$${balance}</p>
+            </div>
+
+            <div class="summary-card">
+              <h4>Total Portfolio Value</h4>
+              <p>$${totalValue}</p>
+            </div>
+          </div>
+
+          <div class="holdings-box">
+            <h4>📌 Holdings</h4>
+            ${
+              portfolio.holdings.length === 0
+              ? "<p>No holdings</p>"
+              : portfolio.holdings.map(h => `
+                  <div class="holding-item">
+                    <span>${h.symbol} (${h.quantity} shares)</span>
+                    <span>$${Number(h.value).toFixed(2)}</span>
+                  </div>
+                `).join("")
+            }
+          </div>
+        `;
+
+      } catch (err) {
+        resultBox.innerHTML = "❌ Server error. Try again.";
+      }
+    }
+  </script>
+
+</body>
+</html>

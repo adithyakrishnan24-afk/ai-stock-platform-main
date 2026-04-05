@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Stock Chatbot</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <div class="container chatbot">
+
+    <h1>🤖 AI Stock Advisor</h1>
+    <p class="subtitle">
+      Ask anything about stocks, trends, risk or trading strategy
+    </p>
+
+    <!-- CHAT WINDOW -->
+    <div class="chat-window" id="chatBox">
+      <div class="bot-msg">
+        👋 Hi! I’m your AI Stock Advisor.<br>
+        Ask me about stocks, buy/sell signals, risk or market sentiment.
+      </div>
+    </div>
+
+    <!-- INPUT -->
+    <div class="chat-input">
+      <input
+        id="userMessage"
+        type="text"
+        placeholder="Ask about AAPL trend, risk level, buy or sell..."
+      />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+
+  </div>
+
+  <script src="js/chatbot.js"></script>
+</body>
+</html>
